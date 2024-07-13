@@ -6,32 +6,18 @@
 //
 
 import SwiftUI
-import Foundation
 
 struct CameraView: View {
     @StateObject private var cameraManager = CameraManager()
     
     var body: some View {
         ZStack {
-            CameraPreview(cameraManager: cameraManager)
+            CameraPreview(arSession: cameraManager.arSession)
                 .ignoresSafeArea()
             
             VStack {
+                BlurredDistanceView(distance: cameraManager.distanceInMeters)
                 Spacer()
-                HStack {
-                    Button(action: {
-                        // TODO: Implement LiDAR functionality
-                        print("LiDAR button tapped")
-                    }) {
-                        Image(systemName: "lidar.sensor")
-                            .font(.largeTitle)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.black.opacity(0.5))
-                            .clipShape(Circle())
-                    }
-                }
-                .padding(.bottom)
             }
         }
         .onAppear {
@@ -40,5 +26,17 @@ struct CameraView: View {
         .onDisappear {
             cameraManager.stopSession()
         }
+    }
+}
+
+struct BlurredDistanceView: View {
+    let distance: Float
+    
+    var body: some View {
+        Text(String(format: "Distance: %.2f m", distance))
+            .padding()
+            .background(.ultraThinMaterial)
+            .cornerRadius(10)
+            .padding(.top)
     }
 }

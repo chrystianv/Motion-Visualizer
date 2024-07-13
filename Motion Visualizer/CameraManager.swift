@@ -5,18 +5,65 @@
 //  Created by Chrystian Vieyra on 7/13/24.
 //
 
-import AVFoundation
 import SwiftUI
+import ARKit
 
-class CameraManager: NSObject, ObservableObject {
+class CameraManager: NSObject, ObservableObject, ARSessionDelegate{
     @Published var session = AVCaptureSession()
     @Published var preview: AVCaptureVideoPreviewLayer?
-    
+    @Published var distanceInMeters: Float = 0.0
+    @Published var arSession = ARSession()
+
     override init() {
         super.init()
-        setupCamera()
+        setupARSession()
     }
     
+    func setupARSession() {
+        arSession.delegate = self
+    }
+
+
+    func startSession() {
+         let configuration = ARWorldTrackingConfiguration()
+         configuration.frameSemantics = .sceneDepth
+         arSession.run(configuration)
+     }
+
+      
+    func stopSession() {
+        arSession.pause()
+    }
+      
+    func session(_ session: ARSession, didUpdate frame: ARFrame) {
+        updateDistanceToCenter()
+    }
+    
+    func updateDistanceToCenter() {
+        guard let frame = arSession.currentFrame,
+              let depthMap = frame.sceneDepth?.depthMap else {
+            return
+        }
+        
+        let width = CVPixelBufferGetWidth(depthMap)
+        let height = CVPixelBufferGetHeight(depthMap)
+        let centerX = width / 2
+        let centerY = height / 2
+        
+        CVPixelBufferLockBaseAddress(depthMap, .readOnly)
+        defer { CVPixelBufferUnlockBaseAddress(depthMap, .readOnly) }
+        
+        if let baseAddress = CVPixelBufferGetBaseAddress(depthMap) {
+            let bytesPerRow = CVPixelBufferGetBytesPerRow(depthMap)
+            let startAddress = baseAddress.advanced(by: centerY * bytesPerRow + centerX * MemoryLayout<Float32>.size)
+            let distanceAtCenter = startAddress.assumingMemoryBound(to: Float32.self).pointee
+            
+            DispatchQueue.main.async {
+                self.distanceInMeters = distanceAtCenter
+            }
+        }
+    }
+
     func setupCamera() {
         session.beginConfiguration()
         
@@ -40,13 +87,6 @@ class CameraManager: NSObject, ObservableObject {
         }
     }
     
-    func startSession() {
-        DispatchQueue.global(qos: .background).async {
-            self.session.startRunning()
-        }
-    }
+     
     
-    func stopSession() {
-        session.stopRunning()
-    }
 }

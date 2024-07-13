@@ -6,21 +6,17 @@
 //
 
 import SwiftUI
+import ARKit
 
 struct CameraPreview: UIViewRepresentable {
-    @ObservedObject var cameraManager: CameraManager
+    let arSession: ARSession
     
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: UIScreen.main.bounds)
-        
-        cameraManager.preview?.frame = view.bounds
-        cameraManager.preview?.videoGravity = .resizeAspectFill
-        view.layer.addSublayer(cameraManager.preview!)
-        
-        return view
+    func makeUIView(context: Context) -> ARSCNView {
+        let arView = ARSCNView(frame: .zero)
+        arView.session = arSession
+        return arView
     }
     
-    func updateUIView(_ uiView: UIView, context: Context) {}
+    func updateUIView(_ uiView: ARSCNView, context: Context) {}
 }
-
 
