@@ -14,6 +14,9 @@
 		810D52902C43118600D39D32 /* Motion_VisualizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810D528F2C43118600D39D32 /* Motion_VisualizerTests.swift */; };
 		810D529A2C43118600D39D32 /* Motion_VisualizerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810D52992C43118600D39D32 /* Motion_VisualizerUITests.swift */; };
 		810D529C2C43118600D39D32 /* Motion_VisualizerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810D529B2C43118600D39D32 /* Motion_VisualizerUITestsLaunchTests.swift */; };
+		810D52A92C43162800D39D32 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810D52A82C43162800D39D32 /* CameraManager.swift */; };
+		810D52AB2C4316BD00D39D32 /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810D52AA2C4316BD00D39D32 /* CameraPreview.swift */; };
+		810D52AD2C4316E400D39D32 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810D52AC2C4316E400D39D32 /* CameraView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +47,9 @@
 		810D52952C43118600D39D32 /* Motion VisualizerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Motion VisualizerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		810D52992C43118600D39D32 /* Motion_VisualizerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion_VisualizerUITests.swift; sourceTree = "<group>"; };
 		810D529B2C43118600D39D32 /* Motion_VisualizerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion_VisualizerUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		810D52A82C43162800D39D32 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		810D52AA2C4316BD00D39D32 /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
+		810D52AC2C4316E400D39D32 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +103,9 @@
 				810D527E2C43118600D39D32 /* Motion_VisualizerApp.swift */,
 				810D52802C43118600D39D32 /* ContentView.swift */,
 				810D52822C43118600D39D32 /* Assets.xcassets */,
+				810D52A82C43162800D39D32 /* CameraManager.swift */,
+				810D52AA2C4316BD00D39D32 /* CameraPreview.swift */,
+				810D52AC2C4316E400D39D32 /* CameraView.swift */,
 				810D52842C43118600D39D32 /* Preview Content */,
 			);
 			path = "Motion Visualizer";
@@ -258,6 +267,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				810D52812C43118600D39D32 /* ContentView.swift in Sources */,
+				810D52AB2C4316BD00D39D32 /* CameraPreview.swift in Sources */,
+				810D52A92C43162800D39D32 /* CameraManager.swift in Sources */,
+				810D52AD2C4316E400D39D32 /* CameraView.swift in Sources */,
 				810D527F2C43118600D39D32 /* Motion_VisualizerApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -425,6 +437,7 @@
 				DEVELOPMENT_TEAM = R7859T37M4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires camera access to utilize the LiDAR sensor for accurate depth mapping";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -454,6 +467,7 @@
 				DEVELOPMENT_TEAM = R7859T37M4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires camera access to utilize the LiDAR sensor for accurate depth mapping";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
