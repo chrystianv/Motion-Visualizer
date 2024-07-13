@@ -4,17 +4,18 @@
 //
 //  Created by Chrystian Vieyra on 7/13/24.
 //
-
 import SwiftUI
 import ARKit
 
-class CameraManager: NSObject, ObservableObject, ARSessionDelegate{
-    @Published var session = AVCaptureSession()
-    @Published var preview: AVCaptureVideoPreviewLayer?
-    @Published var distanceInMeters: Float = 0.0
+class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
     @Published var arSession = ARSession()
-
+    @Published var distanceInMeters: Float = 0.0
+    @Published var targetPosition: CGPoint
+    
+    private var imageResolution: CGSize = .zero
+    
     override init() {
+        self.targetPosition = CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
         super.init()
         setupARSession()
     }
@@ -22,71 +23,78 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate{
     func setupARSession() {
         arSession.delegate = self
     }
-
-
+    
     func startSession() {
-         let configuration = ARWorldTrackingConfiguration()
-         configuration.frameSemantics = .sceneDepth
-         arSession.run(configuration)
-     }
-
-      
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.frameSemantics = .sceneDepth
+        arSession.run(configuration)
+    }
+    
     func stopSession() {
         arSession.pause()
     }
-      
-    func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        updateDistanceToCenter()
-    }
     
-    func updateDistanceToCenter() {
+    func updateDistanceToTarget() {
         guard let frame = arSession.currentFrame,
               let depthMap = frame.sceneDepth?.depthMap else {
+            print("No depth map available")
             return
         }
         
         let width = CVPixelBufferGetWidth(depthMap)
         let height = CVPixelBufferGetHeight(depthMap)
-        let centerX = width / 2
-        let centerY = height / 2
+        
+        // Update image resolution if needed
+        if imageResolution == .zero {
+            imageResolution = CGSize(width: width, height: height)
+            print("Updated image resolution: \(imageResolution)")
+        }
+        
+        // Convert target position to depth map coordinates
+        // Note the change in y-coordinate calculation
+        let x = Int(targetPosition.x * CGFloat(width) / UIScreen.main.bounds.width)
+        let y = Int((1 - targetPosition.y / UIScreen.main.bounds.height) * CGFloat(height))
+        
+        // Ensure the coordinates are within the bounds of the depth map
+        guard x >= 0, x < width, y >= 0, y < height else {
+            print("Target position out of bounds: (\(x), \(y)), Depth map size: (\(width), \(height))")
+            return
+        }
         
         CVPixelBufferLockBaseAddress(depthMap, .readOnly)
         defer { CVPixelBufferUnlockBaseAddress(depthMap, .readOnly) }
         
-        if let baseAddress = CVPixelBufferGetBaseAddress(depthMap) {
-            let bytesPerRow = CVPixelBufferGetBytesPerRow(depthMap)
-            let startAddress = baseAddress.advanced(by: centerY * bytesPerRow + centerX * MemoryLayout<Float32>.size)
-            let distanceAtCenter = startAddress.assumingMemoryBound(to: Float32.self).pointee
-            
-            DispatchQueue.main.async {
-                self.distanceInMeters = distanceAtCenter
-            }
-        }
-    }
-
-    func setupCamera() {
-        session.beginConfiguration()
-        
-        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
-            print("Failed to get camera device")
+        guard let baseAddress = CVPixelBufferGetBaseAddress(depthMap) else {
+            print("Unable to get base address of depth map")
             return
         }
         
-        do {
-            let input = try AVCaptureDeviceInput(device: device)
-            if session.canAddInput(input) {
-                session.addInput(input)
-            }
-            
-            preview = AVCaptureVideoPreviewLayer(session: session)
-            preview?.videoGravity = .resizeAspectFill
-            
-            session.commitConfiguration()
-        } catch {
-            print("Failed to setup camera: \(error.localizedDescription)")
+        let bytesPerRow = CVPixelBufferGetBytesPerRow(depthMap)
+        let startAddress = baseAddress.advanced(by: y * bytesPerRow + x * MemoryLayout<Float32>.size)
+        
+        // Ensure we're not accessing memory outside the buffer
+        guard startAddress >= baseAddress,
+              startAddress < baseAddress.advanced(by: height * bytesPerRow) else {
+            print("Calculated address is out of bounds")
+            return
+        }
+        
+        let distanceAtTarget = startAddress.assumingMemoryBound(to: Float32.self).pointee
+        
+        DispatchQueue.main.async {
+            self.distanceInMeters = distanceAtTarget
         }
     }
     
-     
+    func updateTargetPosition(_ position: CGPoint) {
+        targetPosition = position
+        print("Target position updated: \(position)")
+        updateDistanceToTarget()
+    }
     
+    // MARK: - ARSessionDelegate
+    
+    func session(_ session: ARSession, didUpdate frame: ARFrame) {
+        updateDistanceToTarget()
+    }
 }

@@ -11,20 +11,35 @@ struct CameraView: View {
     @StateObject private var cameraManager = CameraManager()
     
     var body: some View {
-        ZStack {
-            CameraPreview(arSession: cameraManager.arSession)
-                .ignoresSafeArea()
-            
-            VStack {
-                BlurredDistanceView(distance: cameraManager.distanceInMeters)
-                Spacer()
+        GeometryReader { geometry in
+            ZStack {
+                CameraPreview(arSession: cameraManager.arSession)
+                    .ignoresSafeArea()
+                
+                VStack {
+                    BlurredDistanceView(distance: cameraManager.distanceInMeters)
+                    Spacer()
+                }
+                
+                Image(systemName: "scope")
+                    .font(.system(size: 30))
+                    .foregroundColor(.white)
+                    .position(cameraManager.targetPosition)
             }
-        }
-        .onAppear {
-            cameraManager.startSession()
-        }
-        .onDisappear {
-            cameraManager.stopSession()
+            .onAppear {
+                let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                cameraManager.updateTargetPosition(center)
+                cameraManager.startSession()
+            }
+            .onDisappear {
+                cameraManager.stopSession()
+            }
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onEnded { value in
+                        cameraManager.updateTargetPosition(value.location)
+                    }
+            )
         }
     }
 }
