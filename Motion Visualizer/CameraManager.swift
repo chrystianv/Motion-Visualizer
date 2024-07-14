@@ -11,15 +11,19 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
     @Published var arSession = ARSession()
     @Published var distanceInMeters: Float = 0.0
     @Published var targetPosition: CGPoint
-    
+    @Published var confidenceLevel: ARConfidenceLevel = .high
+    @Published var isLiDARAvailable: Bool = false
+
     private var imageResolution: CGSize = .zero
     
+
     override init() {
-        self.targetPosition = CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
-        super.init()
-        setupARSession()
-    }
-    
+         self.targetPosition = CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
+         super.init()
+         self.isLiDARAvailable = ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh)
+         setupARSession()
+     }
+
     func setupARSession() {
         arSession.delegate = self
     }
@@ -36,8 +40,9 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
     
     func updateDistanceToTarget() {
         guard let frame = arSession.currentFrame,
-              let depthMap = frame.sceneDepth?.depthMap else {
-            print("No depth map available")
+              let depthMap = frame.sceneDepth?.depthMap,
+              let confidenceMap = frame.sceneDepth?.confidenceMap else {
+            print("No depth map or confidence map available")
             return
         }
         
@@ -51,7 +56,6 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
         }
         
         // Convert target position to depth map coordinates
-        // Note the change in y-coordinate calculation
         let x = Int(targetPosition.x * CGFloat(width) / UIScreen.main.bounds.width)
         let y = Int((1 - targetPosition.y / UIScreen.main.bounds.height) * CGFloat(height))
         
@@ -62,29 +66,42 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
         }
         
         CVPixelBufferLockBaseAddress(depthMap, .readOnly)
-        defer { CVPixelBufferUnlockBaseAddress(depthMap, .readOnly) }
+        CVPixelBufferLockBaseAddress(confidenceMap, .readOnly)
+        defer {
+            CVPixelBufferUnlockBaseAddress(depthMap, .readOnly)
+            CVPixelBufferUnlockBaseAddress(confidenceMap, .readOnly)
+        }
         
-        guard let baseAddress = CVPixelBufferGetBaseAddress(depthMap) else {
-            print("Unable to get base address of depth map")
+        guard let depthBaseAddress = CVPixelBufferGetBaseAddress(depthMap),
+              let confidenceBaseAddress = CVPixelBufferGetBaseAddress(confidenceMap) else {
+            print("Unable to get base address of depth or confidence map")
             return
         }
         
-        let bytesPerRow = CVPixelBufferGetBytesPerRow(depthMap)
-        let startAddress = baseAddress.advanced(by: y * bytesPerRow + x * MemoryLayout<Float32>.size)
+        let depthBytesPerRow = CVPixelBufferGetBytesPerRow(depthMap)
+        let confidenceBytesPerRow = CVPixelBufferGetBytesPerRow(confidenceMap)
+        
+        let depthStartAddress = depthBaseAddress.advanced(by: y * depthBytesPerRow + x * MemoryLayout<Float32>.size)
+        let confidenceStartAddress = confidenceBaseAddress.advanced(by: y * confidenceBytesPerRow + x * MemoryLayout<UInt8>.size)
         
         // Ensure we're not accessing memory outside the buffer
-        guard startAddress >= baseAddress,
-              startAddress < baseAddress.advanced(by: height * bytesPerRow) else {
+        guard depthStartAddress >= depthBaseAddress,
+              depthStartAddress < depthBaseAddress.advanced(by: height * depthBytesPerRow),
+              confidenceStartAddress >= confidenceBaseAddress,
+              confidenceStartAddress < confidenceBaseAddress.advanced(by: height * confidenceBytesPerRow) else {
             print("Calculated address is out of bounds")
             return
         }
         
-        let distanceAtTarget = startAddress.assumingMemoryBound(to: Float32.self).pointee
+        let distanceAtTarget = depthStartAddress.assumingMemoryBound(to: Float32.self).pointee
+        let confidenceAtTarget = confidenceStartAddress.assumingMemoryBound(to: UInt8.self).pointee
         
         DispatchQueue.main.async {
-            self.distanceInMeters = distanceAtTarget
+                 self.distanceInMeters = distanceAtTarget
+                 self.confidenceLevel = ARConfidenceLevel(rawValue: Int(confidenceAtTarget)) ?? .high
         }
     }
+
     
     func updateTargetPosition(_ position: CGPoint) {
         targetPosition = position

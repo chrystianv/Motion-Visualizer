@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ARKit
 
 struct CameraView: View {
     @StateObject private var cameraManager = CameraManager()
@@ -17,7 +18,11 @@ struct CameraView: View {
                     .ignoresSafeArea()
                 
                 VStack {
-                    BlurredDistanceView(distance: cameraManager.distanceInMeters)
+                    BlurredDistanceView(
+                        distance: cameraManager.distanceInMeters,
+                        confidenceLevel: cameraManager.confidenceLevel,
+                        isLiDARAvailable: cameraManager.isLiDARAvailable
+                    )
                     Spacer()
                 }
                 
@@ -25,6 +30,12 @@ struct CameraView: View {
                     .font(.system(size: 30))
                     .foregroundColor(.white)
                     .position(cameraManager.targetPosition)
+                
+                Text("(\(Int(cameraManager.targetPosition.x)), \(Int(cameraManager.targetPosition.y)))")
+                    .foregroundColor(.white)
+                    .background(Color.black.opacity(0.5))
+                    .padding(5)
+                    .position(x: cameraManager.targetPosition.x, y: cameraManager.targetPosition.y + 30)
             }
             .onAppear {
                 let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
@@ -46,12 +57,33 @@ struct CameraView: View {
 
 struct BlurredDistanceView: View {
     let distance: Float
+    let confidenceLevel: ARConfidenceLevel
+    let isLiDARAvailable: Bool
     
     var body: some View {
-        Text(String(format: "Distance: %.2f m", distance))
-            .padding()
-            .background(.ultraThinMaterial)
-            .cornerRadius(10)
-            .padding(.top)
+        VStack {
+            Text(String(format: "Distance: %.2f m", distance))
+                .foregroundColor(colorForConfidence(confidenceLevel))
+            Text(isLiDARAvailable ? "LiDAR Enabled" : "Using Stereo Depth")
+                .font(.caption)
+                .foregroundColor(.gray)
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .cornerRadius(10)
+        .padding(.top)
+    }
+    
+    private func colorForConfidence(_ confidence: ARConfidenceLevel) -> Color {
+        switch confidence {
+        case .low:
+            return .red
+        case .medium:
+            return .yellow
+        case .high:
+            return .white
+        @unknown default:
+            return .gray
+        }
     }
 }
