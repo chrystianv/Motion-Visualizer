@@ -37,6 +37,16 @@ struct CameraView: View {
                     .background(Color.black.opacity(0.5))
                     .padding(5)
                     .position(x: cameraManager.targetPosition.x, y: cameraManager.targetPosition.y + 30)
+                
+                VStack {
+                    HStack {
+                        Spacer()
+                        UnitToggleButton(isMetric: $cameraManager.isMetric)
+                    }
+                    Spacer()
+                }
+                .padding(.top, 60)
+                .padding(.trailing, 20)
             }
             .onAppear {
                 let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
@@ -56,6 +66,23 @@ struct CameraView: View {
     }
 }
 
+
+struct UnitToggleButton: View {
+    @Binding var isMetric: Bool
+    
+    var body: some View {
+        Button(action: {
+            isMetric.toggle()
+        }) {
+            Image(systemName: isMetric ? "ruler" : "ruler.fill")
+                .foregroundColor(.white)
+                .font(.system(size: 20))
+                .frame(width: 44, height: 44)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
+        }
+    }
+}
 struct BlurredDistanceView: View {
     let distance: Float
     let confidenceLevel: ARConfidenceLevel
@@ -63,42 +90,29 @@ struct BlurredDistanceView: View {
     @Binding var isMetric: Bool
     
     var body: some View {
-          VStack {
-              HStack {
-                  Text(formattedDistance)
-                      .foregroundColor(colorForConfidence(confidenceLevel))
-                  
-                  Button(action: {
-                      isMetric.toggle()
-                  }) {
-                      Image(systemName: isMetric ? "ruler" : "ruler.fill")
-                          .foregroundColor(.white)
-                          .padding(8)
-                          .background(Color.blue)
-                          .clipShape(Circle())
-                  }
-              }
-              
-              Text(isLiDARAvailable ? "LiDAR Enabled" : "Using Stereo Depth")
-                  .font(.caption)
-                  .foregroundColor(.gray)
-          }
-          .padding()
-          .background(.ultraThinMaterial)
-          .cornerRadius(10)
-          .padding(.top)
-      }
-
-    private var formattedDistance: String {
-          if isMetric {
-              return String(format: "Distance: %.2f m", distance)
-          } else {
-              let distanceInCm = distance * 100
-              return String(format: "Distance: %.1f cm", distanceInCm)
-          }
-      }
-
+        VStack {
+            Text(formattedDistance)
+                .foregroundColor(colorForConfidence(confidenceLevel))
+            
+            Text(isLiDARAvailable ? "LiDAR Enabled" : "Using Stereo Depth")
+                .font(.caption)
+                .foregroundColor(.gray)
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .cornerRadius(10)
+        .padding(.top)
+    }
     
+    private var formattedDistance: String {
+        if isMetric {
+            return String(format: "Distance: %.2f m", distance)
+        } else {
+            let distanceInCm = distance * 100
+            return String(format: "Distance: %.1f cm", distanceInCm)
+        }
+    }
+
     private func colorForConfidence(_ confidence: ARConfidenceLevel) -> Color {
         switch confidence {
         case .low:
