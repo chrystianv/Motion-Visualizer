@@ -13,7 +13,9 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
     @Published var targetPosition: CGPoint
     @Published var confidenceLevel: ARConfidenceLevel = .high
     @Published var isLiDARAvailable: Bool = false
-
+    @Published var isMetric: Bool = true
+    
+    
     private var imageResolution: CGSize = .zero
     
 

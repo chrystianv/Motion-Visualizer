@@ -21,7 +21,8 @@ struct CameraView: View {
                     BlurredDistanceView(
                         distance: cameraManager.distanceInMeters,
                         confidenceLevel: cameraManager.confidenceLevel,
-                        isLiDARAvailable: cameraManager.isLiDARAvailable
+                        isLiDARAvailable: cameraManager.isLiDARAvailable,
+                        isMetric: $cameraManager.isMetric
                     )
                     Spacer()
                 }
@@ -36,6 +37,16 @@ struct CameraView: View {
                     .background(Color.black.opacity(0.5))
                     .padding(5)
                     .position(x: cameraManager.targetPosition.x, y: cameraManager.targetPosition.y + 30)
+                
+                VStack {
+                    HStack {
+                        Spacer()
+                        UnitToggleButton(isMetric: $cameraManager.isMetric)
+                    }
+                    Spacer()
+                }
+                .padding(.top, 60)
+                .padding(.trailing, 20)
             }
             .onAppear {
                 let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
@@ -55,15 +66,34 @@ struct CameraView: View {
     }
 }
 
+
+struct UnitToggleButton: View {
+    @Binding var isMetric: Bool
+    
+    var body: some View {
+        Button(action: {
+            isMetric.toggle()
+        }) {
+            Image(systemName: isMetric ? "ruler" : "ruler.fill")
+                .foregroundColor(.white)
+                .font(.system(size: 20))
+                .frame(width: 44, height: 44)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
+        }
+    }
+}
 struct BlurredDistanceView: View {
     let distance: Float
     let confidenceLevel: ARConfidenceLevel
     let isLiDARAvailable: Bool
+    @Binding var isMetric: Bool
     
     var body: some View {
         VStack {
-            Text(String(format: "Distance: %.2f m", distance))
+            Text(formattedDistance)
                 .foregroundColor(colorForConfidence(confidenceLevel))
+            
             Text(isLiDARAvailable ? "LiDAR Enabled" : "Using Stereo Depth")
                 .font(.caption)
                 .foregroundColor(.gray)
@@ -74,6 +104,15 @@ struct BlurredDistanceView: View {
         .padding(.top)
     }
     
+    private var formattedDistance: String {
+        if isMetric {
+            return String(format: "Distance: %.2f m", distance)
+        } else {
+            let distanceInCm = distance * 100
+            return String(format: "Distance: %.1f cm", distanceInCm)
+        }
+    }
+
     private func colorForConfidence(_ confidence: ARConfidenceLevel) -> Color {
         switch confidence {
         case .low:
