@@ -21,7 +21,8 @@ struct CameraView: View {
                     BlurredDistanceView(
                         distance: cameraManager.distanceInMeters,
                         confidenceLevel: cameraManager.confidenceLevel,
-                        isLiDARAvailable: cameraManager.isLiDARAvailable
+                        isLiDARAvailable: cameraManager.isLiDARAvailable,
+                        isMetric: $cameraManager.isMetric
                     )
                     Spacer()
                 }
@@ -59,20 +60,44 @@ struct BlurredDistanceView: View {
     let distance: Float
     let confidenceLevel: ARConfidenceLevel
     let isLiDARAvailable: Bool
+    @Binding var isMetric: Bool
     
     var body: some View {
-        VStack {
-            Text(String(format: "Distance: %.2f m", distance))
-                .foregroundColor(colorForConfidence(confidenceLevel))
-            Text(isLiDARAvailable ? "LiDAR Enabled" : "Using Stereo Depth")
-                .font(.caption)
-                .foregroundColor(.gray)
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .cornerRadius(10)
-        .padding(.top)
-    }
+          VStack {
+              HStack {
+                  Text(formattedDistance)
+                      .foregroundColor(colorForConfidence(confidenceLevel))
+                  
+                  Button(action: {
+                      isMetric.toggle()
+                  }) {
+                      Image(systemName: isMetric ? "ruler" : "ruler.fill")
+                          .foregroundColor(.white)
+                          .padding(8)
+                          .background(Color.blue)
+                          .clipShape(Circle())
+                  }
+              }
+              
+              Text(isLiDARAvailable ? "LiDAR Enabled" : "Using Stereo Depth")
+                  .font(.caption)
+                  .foregroundColor(.gray)
+          }
+          .padding()
+          .background(.ultraThinMaterial)
+          .cornerRadius(10)
+          .padding(.top)
+      }
+
+    private var formattedDistance: String {
+          if isMetric {
+              return String(format: "Distance: %.2f m", distance)
+          } else {
+              let distanceInCm = distance * 100
+              return String(format: "Distance: %.1f cm", distanceInCm)
+          }
+      }
+
     
     private func colorForConfidence(_ confidence: ARConfidenceLevel) -> Color {
         switch confidence {
