@@ -14,8 +14,14 @@ struct CameraView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                CameraPreview(arSession: cameraManager.arSession)
-                    .ignoresSafeArea()
+                Group {
+                    if cameraManager.isDepthMapMode {
+                        DepthMapView(arSession: cameraManager.arSession)
+                    } else {
+                        CameraPreview(arSession: cameraManager.arSession)
+                    }
+                }
+                .ignoresSafeArea()
                 
                 VStack {
                     BlurredDistanceView(
@@ -41,7 +47,10 @@ struct CameraView: View {
                 VStack {
                     HStack {
                         Spacer()
-                        UnitToggleButton(isMetric: $cameraManager.isMetric)
+                        VStack(spacing: 20) {
+                            CameraModeToggleButton(isDepthMapMode: $cameraManager.isDepthMapMode)
+                            UnitToggleButton(isMetric: $cameraManager.isMetric)
+                        }
                     }
                     Spacer()
                 }
@@ -49,8 +58,6 @@ struct CameraView: View {
                 .padding(.trailing, 20)
             }
             .onAppear {
-                let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
-                cameraManager.updateTargetPosition(center)
                 cameraManager.startSession()
             }
             .onDisappear {
@@ -66,6 +73,22 @@ struct CameraView: View {
     }
 }
 
+struct CameraModeToggleButton: View {
+    @Binding var isDepthMapMode: Bool
+    
+    var body: some View {
+        Button(action: {
+            isDepthMapMode.toggle()
+        }) {
+            Image(systemName: "camera.filters")
+                .foregroundColor(.white)
+                .font(.system(size: 20))
+                .frame(width: 44, height: 44)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
+        }
+    }
+}
 
 struct UnitToggleButton: View {
     @Binding var isMetric: Bool
@@ -83,6 +106,7 @@ struct UnitToggleButton: View {
         }
     }
 }
+
 struct BlurredDistanceView: View {
     let distance: Float
     let confidenceLevel: ARConfidenceLevel
@@ -112,7 +136,7 @@ struct BlurredDistanceView: View {
             return String(format: "Distance: %.1f cm", distanceInCm)
         }
     }
-
+    
     private func colorForConfidence(_ confidence: ARConfidenceLevel) -> Color {
         switch confidence {
         case .low:
