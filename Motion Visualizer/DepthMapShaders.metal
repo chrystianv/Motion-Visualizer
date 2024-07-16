@@ -37,7 +37,11 @@ vertex VertexOut vertexShader(uint vertexID [[vertex_id]]) {
 fragment float4 fragmentShader(VertexOut in [[stage_in]],
                                texture2d<float> depthTexture [[texture(0)]]) {
     constexpr sampler textureSampler(mag_filter::linear, min_filter::linear);
-    float depth = depthTexture.sample(textureSampler, in.texCoord).r;
+    
+    // Rotate and flip the texture coordinates
+    float2 rotatedCoords = float2(in.texCoord.y, 1.0 - in.texCoord.x);
+    
+    float depth = depthTexture.sample(textureSampler, rotatedCoords).r;
     
     // Adjust these values to change the visualization
     float minDepth = 0.0;

@@ -114,7 +114,7 @@ struct DepthMapView: UIViewRepresentable {
             commandBuffer.present(drawable)
             commandBuffer.commit()
         }
-        
+
         
         func updateDepthTexture(depthMap: CVPixelBuffer) {
             let width = CVPixelBufferGetWidth(depthMap)
