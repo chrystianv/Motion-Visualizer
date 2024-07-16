@@ -14,7 +14,8 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
     @Published var confidenceLevel: ARConfidenceLevel = .high
     @Published var isLiDARAvailable: Bool = false
     @Published var isMetric: Bool = true
-    
+    @Published var isDepthMapMode: Bool = false
+
     
     private var imageResolution: CGSize = .zero
     
@@ -27,7 +28,16 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
      }
 
     func setupARSession() {
-        arSession.delegate = self
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.frameSemantics = .sceneDepth
+        
+        if ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth) {
+            print("Device supports scene depth")
+        } else {
+            print("Device does not support scene depth")
+        }
+        
+        arSession.run(configuration)
     }
     
     func startSession() {

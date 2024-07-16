@@ -18,6 +18,8 @@
 		810D52AB2C4316BD00D39D32 /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810D52AA2C4316BD00D39D32 /* CameraPreview.swift */; };
 		810D52AD2C4316E400D39D32 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810D52AC2C4316E400D39D32 /* CameraView.swift */; };
 		8191FA282C444ED200C6DFA2 /* DepthConfidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8191FA272C444ED200C6DFA2 /* DepthConfidence.swift */; };
+		8191FA2A2C46A47F00C6DFA2 /* DepthMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8191FA292C46A47F00C6DFA2 /* DepthMapView.swift */; };
+		8191FA2C2C46A4EB00C6DFA2 /* DepthMapShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8191FA2B2C46A4EB00C6DFA2 /* DepthMapShaders.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +54,8 @@
 		810D52AA2C4316BD00D39D32 /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
 		810D52AC2C4316E400D39D32 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		8191FA272C444ED200C6DFA2 /* DepthConfidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthConfidence.swift; sourceTree = "<group>"; };
+		8191FA292C46A47F00C6DFA2 /* DepthMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthMapView.swift; sourceTree = "<group>"; };
+		8191FA2B2C46A4EB00C6DFA2 /* DepthMapShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = DepthMapShaders.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +113,8 @@
 				810D52AA2C4316BD00D39D32 /* CameraPreview.swift */,
 				810D52AC2C4316E400D39D32 /* CameraView.swift */,
 				8191FA272C444ED200C6DFA2 /* DepthConfidence.swift */,
+				8191FA292C46A47F00C6DFA2 /* DepthMapView.swift */,
+				8191FA2B2C46A4EB00C6DFA2 /* DepthMapShaders.metal */,
 				810D52842C43118600D39D32 /* Preview Content */,
 			);
 			path = "Motion Visualizer";
@@ -272,8 +278,10 @@
 				810D52812C43118600D39D32 /* ContentView.swift in Sources */,
 				8191FA282C444ED200C6DFA2 /* DepthConfidence.swift in Sources */,
 				810D52AB2C4316BD00D39D32 /* CameraPreview.swift in Sources */,
+				8191FA2C2C46A4EB00C6DFA2 /* DepthMapShaders.metal in Sources */,
 				810D52A92C43162800D39D32 /* CameraManager.swift in Sources */,
 				810D52AD2C4316E400D39D32 /* CameraView.swift in Sources */,
+				8191FA2A2C46A47F00C6DFA2 /* DepthMapView.swift in Sources */,
 				810D527F2C43118600D39D32 /* Motion_VisualizerApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
