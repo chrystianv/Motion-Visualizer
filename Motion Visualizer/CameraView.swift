@@ -58,8 +58,6 @@ struct CameraView: View {
                 .padding(.trailing, 20)
             }
             .onAppear {
-                let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
-                cameraManager.updateTargetPosition(center)
                 cameraManager.startSession()
             }
             .onDisappear {
@@ -74,7 +72,6 @@ struct CameraView: View {
         }
     }
 }
-
 
 struct CameraModeToggleButton: View {
     @Binding var isDepthMapMode: Bool
@@ -109,6 +106,7 @@ struct UnitToggleButton: View {
         }
     }
 }
+
 struct BlurredDistanceView: View {
     let distance: Float
     let confidenceLevel: ARConfidenceLevel
@@ -138,7 +136,7 @@ struct BlurredDistanceView: View {
             return String(format: "Distance: %.1f cm", distanceInCm)
         }
     }
-
+    
     private func colorForConfidence(_ confidence: ARConfidenceLevel) -> Color {
         switch confidence {
         case .low:

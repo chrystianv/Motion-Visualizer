@@ -16,28 +16,17 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
     @Published var isMetric: Bool = true
     @Published var isDepthMapMode: Bool = false
 
-    
     private var imageResolution: CGSize = .zero
-    
 
     override init() {
-         self.targetPosition = CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
-         super.init()
-         self.isLiDARAvailable = ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh)
-         setupARSession()
-     }
+        self.targetPosition = CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
+        super.init()
+        self.isLiDARAvailable = ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh)
+        setupARSession()
+    }
 
     func setupARSession() {
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.frameSemantics = .sceneDepth
-        
-        if ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth) {
-            print("Device supports scene depth")
-        } else {
-            print("Device does not support scene depth")
-        }
-        
-        arSession.run(configuration)
+        arSession.delegate = self
     }
     
     func startSession() {
@@ -54,26 +43,20 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
         guard let frame = arSession.currentFrame,
               let depthMap = frame.sceneDepth?.depthMap,
               let confidenceMap = frame.sceneDepth?.confidenceMap else {
-            print("No depth map or confidence map available")
             return
         }
         
         let width = CVPixelBufferGetWidth(depthMap)
         let height = CVPixelBufferGetHeight(depthMap)
         
-        // Update image resolution if needed
         if imageResolution == .zero {
             imageResolution = CGSize(width: width, height: height)
-            print("Updated image resolution: \(imageResolution)")
         }
         
-        // Convert target position to depth map coordinates
         let x = Int(targetPosition.x * CGFloat(width) / UIScreen.main.bounds.width)
         let y = Int((1 - targetPosition.y / UIScreen.main.bounds.height) * CGFloat(height))
         
-        // Ensure the coordinates are within the bounds of the depth map
         guard x >= 0, x < width, y >= 0, y < height else {
-            print("Target position out of bounds: (\(x), \(y)), Depth map size: (\(width), \(height))")
             return
         }
         
@@ -86,7 +69,6 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
         
         guard let depthBaseAddress = CVPixelBufferGetBaseAddress(depthMap),
               let confidenceBaseAddress = CVPixelBufferGetBaseAddress(confidenceMap) else {
-            print("Unable to get base address of depth or confidence map")
             return
         }
         
@@ -96,12 +78,10 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
         let depthStartAddress = depthBaseAddress.advanced(by: y * depthBytesPerRow + x * MemoryLayout<Float32>.size)
         let confidenceStartAddress = confidenceBaseAddress.advanced(by: y * confidenceBytesPerRow + x * MemoryLayout<UInt8>.size)
         
-        // Ensure we're not accessing memory outside the buffer
         guard depthStartAddress >= depthBaseAddress,
               depthStartAddress < depthBaseAddress.advanced(by: height * depthBytesPerRow),
               confidenceStartAddress >= confidenceBaseAddress,
               confidenceStartAddress < confidenceBaseAddress.advanced(by: height * confidenceBytesPerRow) else {
-            print("Calculated address is out of bounds")
             return
         }
         
@@ -109,15 +89,15 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
         let confidenceAtTarget = confidenceStartAddress.assumingMemoryBound(to: UInt8.self).pointee
         
         DispatchQueue.main.async {
-                 self.distanceInMeters = distanceAtTarget
-                 self.confidenceLevel = ARConfidenceLevel(rawValue: Int(confidenceAtTarget)) ?? .high
+            if distanceAtTarget.isFinite && distanceAtTarget > 0 {
+                self.distanceInMeters = distanceAtTarget
+                self.confidenceLevel = ARConfidenceLevel(rawValue: Int(confidenceAtTarget)) ?? .high
+            }
         }
     }
-
     
     func updateTargetPosition(_ position: CGPoint) {
         targetPosition = position
-        print("Target position updated: \(position)")
         updateDistanceToTarget()
     }
     
@@ -127,3 +107,4 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
         updateDistanceToTarget()
     }
 }
+
