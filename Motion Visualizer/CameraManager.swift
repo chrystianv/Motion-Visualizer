@@ -6,6 +6,7 @@
 //
 import SwiftUI
 import ARKit
+import DGCharts
 
 class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
     @Published var arSession = ARSession()
@@ -15,6 +16,9 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
     @Published var isLiDARAvailable: Bool = false
     @Published var isMetric: Bool = true
     @Published var isDepthMapMode: Bool = false
+    @Published var distanceEntries: [ChartDataEntry] = []
+       private let maxDataPoints = 100
+       private var startTime: Date?
 
     private var imageResolution: CGSize = .zero
 
@@ -89,12 +93,27 @@ class CameraManager: NSObject, ObservableObject, ARSessionDelegate {
         let confidenceAtTarget = confidenceStartAddress.assumingMemoryBound(to: UInt8.self).pointee
         
         DispatchQueue.main.async {
-            if distanceAtTarget.isFinite && distanceAtTarget > 0 {
-                self.distanceInMeters = distanceAtTarget
-                self.confidenceLevel = ARConfidenceLevel(rawValue: Int(confidenceAtTarget)) ?? .high
-            }
-        }
-    }
+                   if distanceAtTarget.isFinite && distanceAtTarget > 0 {
+                       self.distanceInMeters = distanceAtTarget
+                       self.confidenceLevel = ARConfidenceLevel(rawValue: Int(confidenceAtTarget)) ?? .high
+                       
+                       // Add new data point to history
+                       if self.startTime == nil {
+                           self.startTime = Date()
+                       }
+                       let timeInterval = Date().timeIntervalSince(self.startTime!)
+                       let newEntry = ChartDataEntry(x: timeInterval, y: Double(distanceAtTarget))
+                       self.distanceEntries.append(newEntry)
+                       
+                       // Remove oldest data point if we exceed maxDataPoints
+                       if self.distanceEntries.count > self.maxDataPoints {
+                           self.distanceEntries.removeFirst()
+                       }
+                   }
+               }
+           }
+       
+
     
     func updateTargetPosition(_ position: CGPoint) {
         targetPosition = position

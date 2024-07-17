@@ -7,71 +7,87 @@
 
 import SwiftUI
 import ARKit
+import DGCharts
 
 struct CameraView: View {
     @StateObject private var cameraManager = CameraManager()
+    @State private var isChartVisible = false
     
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                Group {
-                    if cameraManager.isDepthMapMode {
-                        DepthMapView(arSession: cameraManager.arSession)
-                    } else {
-                        CameraPreview(arSession: cameraManager.arSession)
-                    }
-                }
-                .ignoresSafeArea()
-                
-                VStack {
-                    BlurredDistanceView(
-                        distance: cameraManager.distanceInMeters,
-                        confidenceLevel: cameraManager.confidenceLevel,
-                        isLiDARAvailable: cameraManager.isLiDARAvailable,
-                        isMetric: $cameraManager.isMetric
-                    )
-                    Spacer()
-                }
-                
-                Image(systemName: "scope")
-                    .font(.system(size: 30))
-                    .foregroundColor(.white)
-                    .position(cameraManager.targetPosition)
-                
-                Text("(\(Int(cameraManager.targetPosition.x)), \(Int(cameraManager.targetPosition.y)))")
-                    .foregroundColor(.white)
-                    .background(Color.black.opacity(0.5))
-                    .padding(5)
-                    .position(x: cameraManager.targetPosition.x, y: cameraManager.targetPosition.y + 30)
-                
-                VStack {
-                    HStack {
-                        Spacer()
-                        VStack(spacing: 20) {
-                            CameraModeToggleButton(isDepthMapMode: $cameraManager.isDepthMapMode)
-                            UnitToggleButton(isMetric: $cameraManager.isMetric)
-                        }
-                    }
-                    Spacer()
-                }
-                .padding(.top, 60)
-                .padding(.trailing, 20)
-            }
-            .onAppear {
-                cameraManager.startSession()
-            }
-            .onDisappear {
-                cameraManager.stopSession()
-            }
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onEnded { value in
-                        cameraManager.updateTargetPosition(value.location)
-                    }
-            )
-        }
-    }
-}
+           GeometryReader { geometry in
+               ZStack {
+                   Group {
+                       if cameraManager.isDepthMapMode {
+                           DepthMapView(arSession: cameraManager.arSession)
+                       } else {
+                           CameraPreview(arSession: cameraManager.arSession)
+                       }
+                   }
+                   .ignoresSafeArea()
+                   
+                   VStack {
+                       BlurredDistanceView(
+                           distance: cameraManager.distanceInMeters,
+                           confidenceLevel: cameraManager.confidenceLevel,
+                           isLiDARAvailable: cameraManager.isLiDARAvailable,
+                           isMetric: $cameraManager.isMetric
+                       )
+                       Spacer()
+                   }
+                   
+                   Image(systemName: "scope")
+                       .font(.system(size: 30))
+                       .foregroundColor(.white)
+                       .position(cameraManager.targetPosition)
+                   
+                   Text("(\(Int(cameraManager.targetPosition.x)), \(Int(cameraManager.targetPosition.y)))")
+                       .foregroundColor(.white)
+                       .background(Color.black.opacity(0.5))
+                       .padding(5)
+                       .position(x: cameraManager.targetPosition.x, y: cameraManager.targetPosition.y + 30)
+                   
+                   VStack {
+                       HStack {
+                           Spacer()
+                           VStack(spacing: 20) {
+                               CameraModeToggleButton(isDepthMapMode: $cameraManager.isDepthMapMode)
+                               UnitToggleButton(isMetric: $cameraManager.isMetric)
+                               ChartToggleButton(isChartVisible: $isChartVisible)
+                           }
+                       }
+                       Spacer()
+                   }
+                   .padding(.top, 60)
+                   .padding(.trailing, 20)
+                   
+                   if isChartVisible {
+                       VStack {
+                           Spacer()
+                           DistanceChartView(cameraManager: cameraManager)
+                               .frame(height: geometry.size.height / 3)
+                               .padding(.horizontal)
+                               .background(.ultraThinMaterial)
+                               .cornerRadius(10)
+                               .padding(.bottom, 20)
+                       }
+                   }
+               }
+               .onAppear {
+                   cameraManager.startSession()
+               }
+               .onDisappear {
+                   cameraManager.stopSession()
+               }
+               .gesture(
+                   DragGesture(minimumDistance: 0)
+                       .onEnded { value in
+                           cameraManager.updateTargetPosition(value.location)
+                       }
+               )
+           }
+       }
+   }
+
 
 struct CameraModeToggleButton: View {
     @Binding var isDepthMapMode: Bool
@@ -81,6 +97,23 @@ struct CameraModeToggleButton: View {
             isDepthMapMode.toggle()
         }) {
             Image(systemName: "camera.filters")
+                .foregroundColor(.white)
+                .font(.system(size: 20))
+                .frame(width: 44, height: 44)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
+        }
+    }
+}
+
+struct ChartToggleButton: View {
+    @Binding var isChartVisible: Bool
+    
+    var body: some View {
+        Button(action: {
+            isChartVisible.toggle()
+        }) {
+            Image(systemName: "chart.xyaxis.line")
                 .foregroundColor(.white)
                 .font(.system(size: 20))
                 .frame(width: 44, height: 44)
