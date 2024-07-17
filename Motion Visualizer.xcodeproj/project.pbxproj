@@ -20,6 +20,8 @@
 		8191FA282C444ED200C6DFA2 /* DepthConfidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8191FA272C444ED200C6DFA2 /* DepthConfidence.swift */; };
 		8191FA2A2C46A47F00C6DFA2 /* DepthMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8191FA292C46A47F00C6DFA2 /* DepthMapView.swift */; };
 		8191FA2C2C46A4EB00C6DFA2 /* DepthMapShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8191FA2B2C46A4EB00C6DFA2 /* DepthMapShaders.metal */; };
+		8191FA312C47DB7A00C6DFA2 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 8191FA302C47DB7A00C6DFA2 /* DGCharts */; };
+		8191FA352C47DC5100C6DFA2 /* DistanceChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8191FA342C47DC5100C6DFA2 /* DistanceChartView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +41,19 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		8191FA372C47DE8700C6DFA2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		810D527B2C43118600D39D32 /* Motion Visualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Motion Visualizer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		810D527E2C43118600D39D32 /* Motion_VisualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion_VisualizerApp.swift; sourceTree = "<group>"; };
@@ -56,6 +71,7 @@
 		8191FA272C444ED200C6DFA2 /* DepthConfidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthConfidence.swift; sourceTree = "<group>"; };
 		8191FA292C46A47F00C6DFA2 /* DepthMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthMapView.swift; sourceTree = "<group>"; };
 		8191FA2B2C46A4EB00C6DFA2 /* DepthMapShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = DepthMapShaders.metal; sourceTree = "<group>"; };
+		8191FA342C47DC5100C6DFA2 /* DistanceChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8191FA312C47DB7A00C6DFA2 /* DGCharts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +133,7 @@
 				8191FA292C46A47F00C6DFA2 /* DepthMapView.swift */,
 				8191FA2B2C46A4EB00C6DFA2 /* DepthMapShaders.metal */,
 				810D52842C43118600D39D32 /* Preview Content */,
+				8191FA342C47DC5100C6DFA2 /* DistanceChartView.swift */,
 			);
 			path = "Motion Visualizer";
 			sourceTree = "<group>";
@@ -155,12 +173,16 @@
 				810D52772C43118600D39D32 /* Sources */,
 				810D52782C43118600D39D32 /* Frameworks */,
 				810D52792C43118600D39D32 /* Resources */,
+				8191FA372C47DE8700C6DFA2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = "Motion Visualizer";
+			packageProductDependencies = (
+				8191FA302C47DB7A00C6DFA2 /* DGCharts */,
+			);
 			productName = "Motion Visualizer";
 			productReference = 810D527B2C43118600D39D32 /* Motion Visualizer.app */;
 			productType = "com.apple.product-type.application";
@@ -233,6 +255,9 @@
 				Base,
 			);
 			mainGroup = 810D52722C43118600D39D32;
+			packageReferences = (
+				8191FA2F2C47DB7900C6DFA2 /* XCRemoteSwiftPackageReference "Charts" */,
+			);
 			productRefGroup = 810D527C2C43118600D39D32 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -283,6 +308,7 @@
 				810D52AD2C4316E400D39D32 /* CameraView.swift in Sources */,
 				8191FA2A2C46A47F00C6DFA2 /* DepthMapView.swift in Sources */,
 				810D527F2C43118600D39D32 /* Motion_VisualizerApp.swift in Sources */,
+				8191FA352C47DC5100C6DFA2 /* DistanceChartView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -614,6 +640,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8191FA2F2C47DB7900C6DFA2 /* XCRemoteSwiftPackageReference "Charts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/danielgindi/Charts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8191FA302C47DB7A00C6DFA2 /* DGCharts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8191FA2F2C47DB7900C6DFA2 /* XCRemoteSwiftPackageReference "Charts" */;
+			productName = DGCharts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 810D52732C43118600D39D32 /* Project object */;
 }
