@@ -12,6 +12,8 @@ import DGCharts
 struct CameraView: View {
     @StateObject private var cameraManager = CameraManager()
     @State private var isChartVisible = false
+    @State private var isInfoPopupPresented = false
+
     
     var body: some View {
            GeometryReader { geometry in
@@ -40,12 +42,6 @@ struct CameraView: View {
                        .foregroundColor(.white)
                        .position(cameraManager.targetPosition)
                    
-                   Text("(\(Int(cameraManager.targetPosition.x)), \(Int(cameraManager.targetPosition.y)))")
-                       .foregroundColor(.white)
-                       .background(Color.black.opacity(0.5))
-                       .padding(5)
-                       .position(x: cameraManager.targetPosition.x, y: cameraManager.targetPosition.y + 30)
-                   
                    VStack {
                        HStack {
                            Spacer()
@@ -53,6 +49,7 @@ struct CameraView: View {
                                CameraModeToggleButton(isDepthMapMode: $cameraManager.isDepthMapMode)
                                UnitToggleButton(isMetric: $cameraManager.isMetric)
                                ChartToggleButton(isChartVisible: $isChartVisible)
+                               InfoButton(isPresented: $isInfoPopupPresented)
                            }
                        }
                        Spacer()
@@ -79,15 +76,35 @@ struct CameraView: View {
                    cameraManager.stopSession()
                }
                .gesture(
-                   DragGesture(minimumDistance: 0)
-                       .onEnded { value in
-                           cameraManager.updateTargetPosition(value.location)
+                               DragGesture(minimumDistance: 0)
+                                   .onEnded { value in
+                                       cameraManager.updateTargetPosition(value.location)
+                                   }
+                           )
+                           .sheet(isPresented: $isInfoPopupPresented) {
+                               InfoPopupView(isPresented: $isInfoPopupPresented)
+                           }
                        }
-               )
-           }
-       }
-   }
+                   }
+               }
 
+
+struct InfoButton: View {
+    @Binding var isPresented: Bool
+    
+    var body: some View {
+        Button(action: {
+            isPresented = true
+        }) {
+            Image(systemName: "info.circle")
+                .foregroundColor(.white)
+                .font(.system(size: 20))
+                .frame(width: 44, height: 44)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
+        }
+    }
+}
 
 struct CameraModeToggleButton: View {
     @Binding var isDepthMapMode: Bool
