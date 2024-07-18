@@ -22,6 +22,7 @@
 		8191FA2C2C46A4EB00C6DFA2 /* DepthMapShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8191FA2B2C46A4EB00C6DFA2 /* DepthMapShaders.metal */; };
 		8191FA312C47DB7A00C6DFA2 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 8191FA302C47DB7A00C6DFA2 /* DGCharts */; };
 		8191FA352C47DC5100C6DFA2 /* DistanceChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8191FA342C47DC5100C6DFA2 /* DistanceChartView.swift */; };
+		8191FA392C4932F600C6DFA2 /* InfoPopUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8191FA382C4932F600C6DFA2 /* InfoPopUpView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +73,7 @@
 		8191FA292C46A47F00C6DFA2 /* DepthMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthMapView.swift; sourceTree = "<group>"; };
 		8191FA2B2C46A4EB00C6DFA2 /* DepthMapShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = DepthMapShaders.metal; sourceTree = "<group>"; };
 		8191FA342C47DC5100C6DFA2 /* DistanceChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceChartView.swift; sourceTree = "<group>"; };
+		8191FA382C4932F600C6DFA2 /* InfoPopUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoPopUpView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,8 +134,9 @@
 				8191FA272C444ED200C6DFA2 /* DepthConfidence.swift */,
 				8191FA292C46A47F00C6DFA2 /* DepthMapView.swift */,
 				8191FA2B2C46A4EB00C6DFA2 /* DepthMapShaders.metal */,
-				810D52842C43118600D39D32 /* Preview Content */,
+				8191FA382C4932F600C6DFA2 /* InfoPopUpView.swift */,
 				8191FA342C47DC5100C6DFA2 /* DistanceChartView.swift */,
+				810D52842C43118600D39D32 /* Preview Content */,
 			);
 			path = "Motion Visualizer";
 			sourceTree = "<group>";
@@ -309,6 +312,7 @@
 				8191FA2A2C46A47F00C6DFA2 /* DepthMapView.swift in Sources */,
 				810D527F2C43118600D39D32 /* Motion_VisualizerApp.swift in Sources */,
 				8191FA352C47DC5100C6DFA2 /* DistanceChartView.swift in Sources */,
+				8191FA392C4932F600C6DFA2 /* InfoPopUpView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
